@@ -627,7 +627,7 @@
     let editingImageId = null; let isDrawing = false; let originalImageObj = null;
     let pendingPostPrintAction = null;
     
-    const DB_NAME = "RocheChecklistDB_vFinalFixed2"; const STORE_NAME = "DraftStore";
+    const DB_NAME = "RocheChecklistDB_vFinalFixed3"; const STORE_NAME = "DraftStore";
     let autoSaveTimer = null; let saveIndicatorTimer = null;
 
     function setSaveIndicator(msg = '자동저장됨', state = 'saved') {
@@ -690,7 +690,7 @@
         if(hasStarted) queueAutoSave();
     }
     function togglePassFail(btn, val) {
-        const grp = btn.closest('.status-group'); const hid = grp.querySelector('.status-value'); const act = btn.classList.contains('active');
+        const grp = closestElement(btn, '.status-group'); const hid = grp.querySelector('.status-value'); const act = btn.classList.contains('active');
         grp.querySelectorAll('.chk-btn').forEach(b => b.classList.remove('active')); hid.value = '';
         if(!act) { btn.classList.add('active'); hid.value = val; } if(hasStarted) queueAutoSave();
     }
@@ -698,6 +698,7 @@
         group.querySelector('.status-value').value = val; group.querySelectorAll('.chk-btn').forEach(b => b.classList.remove('active'));
         if(val === 'Pass' || val === 'O') { group.querySelector('.chk-btn')?.classList.add('active'); group.querySelector('.status-value').value = 'Pass'; }
     }
+    function closestElement(el, selector) { return el.closest(selector); }
 
     function makeImageId() { return `${Date.now()}_${Math.random().toString(36).substr(2, 6)}`; }
     async function downscaleImage(file, maxSide = 1280) {
@@ -804,7 +805,7 @@
         if(document.querySelectorAll('.modal-overlay.show').length === 0) document.body.style.overflow = ''; 
     }
 
-    // [인쇄 기능 완벽 복구]
+    // [인쇄 기능: 사파리 차단 방지 적용]
     function openPrintSelectModal() { 
         closeFabMenu(); 
         document.querySelectorAll('.print-tab-chk').forEach(chk => chk.checked = false);
@@ -861,19 +862,19 @@
         closeModal('printSelectModal'); 
         renderPrintPhotos();
         
+        // 아이패드 사파리 차단 방지를 위해 타이머(setTimeout) 제거 후 즉시 인쇄 실행
+        const originalTitle = document.title; 
+        const projInput = sanitizeFileName(document.getElementById('project_name').value.trim()); 
+        const dateInput = document.getElementById('check_date').value.replace(/[^0-9]/g, ""); 
+        if (projInput) document.title = `${projInput} ${dateInput} Pre-site Checklist`.trim();
+
+        // 딜레이 없이 호출
+        window.print(); 
+
         setTimeout(() => { 
-            const originalTitle = document.title; 
-            const projInput = sanitizeFileName(document.getElementById('project_name').value.trim()); 
-            const dateInput = document.getElementById('check_date').value.replace(/[^0-9]/g, ""); 
-            if (projInput) document.title = `${projInput} ${dateInput} Pre-site Checklist`.trim();
-
-            window.print(); 
-
-            setTimeout(() => { 
-                document.title = originalTitle; 
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('print-active'));
-            }, 500);
-        }, 100);
+            document.title = originalTitle; 
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('print-active'));
+        }, 500);
     }
 
     window.addEventListener('afterprint', () => { 
@@ -948,7 +949,7 @@
                 if(inputEls[i]) { 
                     if (inputEls[i].classList.contains('remark-input')) inputEls[i].dataset.fulltext = val; 
                     inputEls[i].value = String(val || '').replace(/\n/g, ' '); 
-                    syncPrintText(inputEls[i]); 
+                    handleInputSync(inputEls[i]); 
                 } 
             });
             
@@ -1021,28 +1022,7 @@
             dateInput.addEventListener('blur', () => updateDateOverlay()); 
         }
 
-        // 공유 파일인지 확인 후 처리, 아니면 DB 로드
-        if (window.INJECTED_IMAGES && Object.keys(window.INJECTED_IMAGES).length > 0) {
-            globalImages = window.INJECTED_IMAGES;
-            hasStarted = window.INJECTED_HAS_STARTED ?? true;
-            lastActiveTab = window.INJECTED_LAST_TAB || 'tab1';
-            
-            if (hasStarted) {
-                document.body.classList.add('app-started');
-                switchTab(lastActiveTab);
-            }
-
-            // 시각적 상태 복구
-            document.querySelectorAll('.grid-item-row').forEach(row => { const itemId = getItemId(row); if(itemId) updateItemPhotoUI(itemId, row); });
-            document.querySelectorAll('.remark-input').forEach(input => syncPrintText(input));
-            document.querySelectorAll('.status-value').forEach(h => { if(h.value) setStatusByValue(h.closest('.status-group'), h.value); });
-            document.querySelectorAll('.switch input:not(.remark-toggle-chk)').forEach(chk => togglePhase(chk, true));
-            document.querySelectorAll('.remark-toggle-chk').forEach(chk => toggleRemarkUI(chk, true));
-            
-            setSaveIndicator('공유본 불러옴', 'saved'); updateDateOverlay();
-        } else { 
-            loadFromDatabase(); 
-        }
+        loadFromDatabase(); 
     });
 </script>
 </body>
