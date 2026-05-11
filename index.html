@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="main-title">CL&P Installation Pre-site Checklist</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext x='50%25' y='54%25' font-size='50' text-anchor='middle' dominant-baseline='middle'%3E👍%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="ROCHE2.png">
+    <meta name="apple-mobile-web-app-title" content="장비체크">
+    
+    <style>
+        /* [1. 로슈 테마 RGB 컬러 적용] */
+        :root {
+            --roche-blue: rgb(11, 65, 205);
+            --roche-blue-dark: rgb(2, 35, 102);
+            --light-blue: rgb(189, 227, 255);
+            --border-color: #cbd5e1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: ui-rounded, "SF Pro Rounded", "SUIT Variable", "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+            background: radial-gradient(circle at top, rgba(11, 65, 205, 0.06), transparent 28%), linear-gradient(180deg, #f7f9fe 0%, #eff4fb 100%);
+            color: var(--text-main); margin: 0; padding: 26px; padding-bottom: 160px;
+            display: flex; justify-content: center; overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%; max-width: 1050px; background: rgba(255, 255, 255, 0.95);
+            padding: 30px 30px 34px; border-radius: 30px;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, 0.11), 0 2px 10px rgba(11, 65, 205, 0.04);
+            border: 1px solid rgba(219, 228, 240, 0.88); border-top: 6px solid var(--roche-blue);
+            position: relative; backdrop-filter: blur(18px) saturate(125%);
+        }
+
+        /* 메인 헤더 */
+        header { text-align: left; margin-bottom: 22px; padding: 0 0 10px 2px; position: relative; }
+        header h1 { color: var(--roche-blue); margin: 0 0 7px 0; font-size: 31px; font-weight: 800; letter-spacing: -0.55px; line-height: 1.08; }
+        .brand-subtitle { color: var(--text-muted); margin: 0; padding-left: 6px; font-size: 15.5px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.34; }
+
+        .top-right-status { position: absolute; right: 22px; bottom: 0; z-index: 5; }
+        .save-indicator { font-size: 12px; font-weight: 800; color: #475569; background: #f8fafc; border: 1px solid #dbe4f0; border-radius: 999px; padding: 8px 13px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04); }
+        .save-indicator.pending { color: #b45309; background: #fff7ed; border-color: #fdba74; }
+        .save-indicator.saved { color: #047857; background: #ecfdf5; border-color: #86efac; }
+
+        /* [상태 관리에 따른 숨김/표시] */
+        .tabs-container { display: none; gap: 10px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0px; }
+        #tabs-wrapper { display: none; }
+        
+        body.app-started .tabs-container { display: flex; animation: fadeIn 0.4s ease; }
+        body.app-started #tabs-wrapper { display: block; animation: fadeIn 0.4s ease; }
+
+        .tab-btn {
+            padding: 12px 24px; border: none; background: transparent; font-size: 16.5px; font-weight: 800; 
+            color: #94a3b8; cursor: pointer; border-radius: 10px 10px 0 0; transition: all 0.2s; position: relative;
+        }
+        .tab-btn:hover { color: #64748b; background: #f8fafc; }
+        .tab-btn.active { color: var(--roche-blue); background: #f1f5f9; }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 4px; 
+            background: var(--roche-blue); border-radius: 4px 4px 0 0;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .tab-content.print-active { display: block !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* [상단 정보 영역] */
+        .top-info {
+            position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px 20px;
+            margin: 0 0 26px; padding: 22px 22px 18px; border-radius: 24px; border: 1px solid #e2e8f3;
+            background: linear-gradient(180deg, #fcfeff 0%, #f5fbff 100%); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.045);
+        }
+        .info-box { display: flex; flex-direction: column; justify-content: flex-end; min-height: 68px; border-bottom: 1px solid #cdd8e7; padding-bottom: 4px; }
+        .info-box.project-box { grid-column: span 5; } .info-box.date-box { grid-column: span 3; cursor: pointer; } .info-box.eng-box { grid-column: span 4; }
+        .info-box label { font-weight: 800; font-size: 11.5px; color: #74839b; text-transform: uppercase; margin-bottom: auto; }
+        .info-box input { border: none; background: transparent; width: 100%; font-size: 19px; font-weight: 700; outline: none; color: var(--text-main); }
+        
+        .date-input-shell { position: relative; width: 100%; display: flex; align-items: flex-end; }
+        #check_date { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .date-overlay { display: flex; align-items: center; gap: 8px; color: #7b8aa6; z-index: 1; }
+        .date-prefix { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 10px; background: rgba(11, 65, 205, 0.1); color: var(--roche-blue); font-size: 12px; }
+        .date-display { font-size: 19px; font-weight: 700; }
+        .date-box.has-date .date-overlay { color: var(--text-main); }
+
+        .equipment-box { grid-column: 1 / -1; border-bottom: none; margin-top: 2px; }
+        
+        .equipment-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .eq-title-wrap { display: flex; align-items: baseline; gap: 10px; }
+        .equipment-hint { font-size: 12px; font-weight: 700; color: #8a97ae; }
+        
+        .btn-start { 
+            background: linear-gradient(180deg, #2A93DE 0%, var(--roche-blue) 100%); color: white; border: none; 
+            padding: 10px 20px; border-radius: 12px; font-size: 14.5px; font-weight: 800; cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(11, 65, 205, 0.2); transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(11, 65, 205, 0.3); }
+        body.app-started .btn-start { display: none !important; }
+
+        .equipment-panel { display: flex; flex-wrap: wrap; gap: 10px; }
+        .equipment-btn { border: 1px solid #d7e2f3; background: #ffffff; color: var(--roche-blue); min-height: 44px; padding: 10px 16px; border-radius: 16px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; }
+        .equipment-btn.active { background: var(--roche-blue); color: white; border-color: var(--roche-blue); box-shadow: 0 8px 16px rgba(11, 65, 205, 0.14); transform: translateY(-1px); }
+
+        .equip-text-wrapper { margin-top: 15px; width: 100%; border-bottom: 1px solid #cdd8e7; padding-bottom: 4px; }
+        .equip-text-input { border: none; background: transparent; width: 100%; font-size: 19px; font-weight: 700; outline: none; color: var(--text-main); }
+        .equip-text-input::placeholder { color: #94a3b8; font-weight: 500; font-size: 17px; }
+
+        /* [3. CSS Grid 테이블 렌더링 - 아이패드 대응 유동적 너비 적용] */
+        .grid-table { display: flex; flex-direction: column; width: 100%; }
+        
+        .grid-header-row, .grid-item-row {
+            display: grid; 
+            /* 아이패드 해상도에서 360px로 인해 찌그러지는 현상 방지용 minmax 적용 */
+            grid-template-columns: 50px minmax(0, 1fr) 75px 90px minmax(200px, 360px); 
+            width: 100%; box-sizing: border-box; align-items: center;
+        }
+
+        .grid-header-row {
+            background-color: var(--roche-blue); color: white;
+            border-radius: 12px 12px 0 0; margin-bottom: 0px; border: none;
+            box-shadow: 0 4px 10px rgba(11, 65, 205, 0.15);
+        }
+        .grid-header-row > div { padding: 14px 10px; font-size: 14.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; color: white; white-space: nowrap;}
+        .grid-header-row > div:nth-child(2) { justify-content: flex-start; }
+
+        .phase-group {
+            background: #ffffff; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03); margin-bottom: 10px; overflow: hidden;
+        }
+        .phase-group:not([data-phase="1"]) { border-top: 1px solid #e2e8f0; border-radius: 12px; }
+
+        .grid-category-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: rgba(189, 227, 255, 0.25); border-bottom: 2px solid rgba(11, 65, 205, 0.6);
+            padding: 12px 15px; box-sizing: border-box;
+        }
+        .g-col-title { font-size: 15px; font-weight: 800; color: var(--roche-blue-dark); }
+        .header-btn-group { display: flex; gap: 8px; align-items: center; }
+
+        /* 완벽한 CSS Grid 아코디언 애니메이션 */
+        .phase-accordion-wrapper {
+            display: grid; grid-template-rows: 1fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .phase-group.collapsed-phase .phase-accordion-wrapper { grid-template-rows: 0fr; }
+        .phase-accordion-inner { overflow: hidden; }
+
+        .grid-item-row { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+        .grid-item-row:last-child { border-bottom: none; }
+        .grid-item-row:hover { background: #fcfcfc; }
+        .grid-item-row > div { padding: 12px 10px; display: flex; align-items: center; min-width: 0; }
+        
+        .g-col-no { justify-content: center; font-weight: 700; color: #94a3b8; font-size: 14px; }
+        .g-col-item { justify-content: flex-start; font-weight: 600; font-size: 14.5px; color: var(--text-main); line-height: 1.4; word-break: keep-all; }
+        .g-col-status { justify-content: center; }
+        .g-col-remark-toggle { justify-content: center; }
+        .g-col-remark-ui { justify-content: flex-start; padding-left: 0 !important;}
+
+        /* 결과 확인 체크박스 */
+        .status-group { display: flex; justify-content: center; align-items: center; width: 100%; }
+        .chk-btn {
+            width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--border-color); background: #ffffff;
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; justify-content: center; align-items: center; position: relative;
+        }
+        .chk-btn.active { background: var(--roche-blue-dark); border-color: var(--roche-blue-dark); }
+        .chk-btn::after {
+            content: ''; width: 5px; height: 10px; border: solid white; border-width: 0 3px 3px 0;
+            transform: rotate(45deg) scale(0.5); opacity: 0; transition: all 0.2s; margin-bottom: 2px;
+        }
+        .chk-btn.active::after { opacity: 1; transform: rotate(45deg) scale(1); }
+
+        /* 비고 작성 토글 및 비고 UI */
+        .toggle-label { font-size: 13px; color: var(--roche-blue); font-weight: 700; margin-right: 2px; }
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: rgba(11, 65, 205, 0.6); } input:checked + .slider:before { transform: translateX(18px); }
+        
+        .small-switch { width: 34px; height: 20px; }
+        .small-switch .slider:before { height: 14px; width: 14px; left: 3px; bottom: 3px; }
+        .small-switch input:checked + .slider:before { transform: translateX(14px); }
+
+        @media (min-width: 769px) {
+            .remark-ui-accordion {
+                opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; pointer-events: none; width: 100%;
+            }
+            .remark-ui-accordion.open { opacity: 1; transform: translateX(0); pointer-events: auto; }
+        }
+
+        .remark-wrapper { display: flex; align-items: center; width: 100%; gap: 6px; }
+        
+        .remark-input {
+            flex: 1; min-width: 0; height: 34px; padding: 0 10px; border: 1px solid var(--border-color); border-radius: 6px;
+            outline: none; font-size: 14px; color: var(--text-main); transition: all 0.2s; background: #fff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+        }
+        .remark-input::placeholder { color: #94a3b8; }
+        .print-remark-text { display: none; }
+
+        .action-icon-btn {
+            background: #f8fafc; border: 1px solid var(--border-color); cursor: pointer; color: #475569;
+            width: 34px; height: 34px; border-radius: 6px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; transition: all 0.2s;
+        }
+        .item-attachment-count-btn {
+            min-width: 44px; height: 34px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; transition: all 0.2s; flex-shrink: 0; display: flex; justify-content: center; align-items: center;
+        }
+        .item-attachment-count-btn.count-0 { background: #f8fafc; border: 1px solid var(--border-color); color: #94a3b8; }
+        .item-attachment-count-btn.count-active { background: rgba(11, 65, 205, 0.08); border: 1px solid rgba(11, 65, 205, 0.3); color: var(--roche-blue); }
+        .photo-upload-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+        /* 플로팅 액션 버튼 (FAB) */
+        .fab-container { position: fixed; bottom: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; z-index: 100; gap: 15px; }
+        .fab-menu { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; opacity: 0; visibility: hidden; transform: translateY(30px) scale(0.95); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; transform-origin: bottom right; }
+        .fab-menu.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
+        .fab-main { padding: 13px 22px; background: linear-gradient(180deg, #2A93DE 0%, var(--roche-blue) 100%); color: white; border: none; border-radius: 18px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 24px rgba(0, 122, 194, 0.28); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .fab-main.active { background: linear-gradient(180deg, #64748B 0%, #475569 100%); box-shadow: 0 4px 15px rgba(71, 85, 105, 0.25); }
+        .action-btn { height: 42px; border: none; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); display: flex; align-items: center; transition: all 0.2s; padding: 0 20px;}
+        .fab-menu .action-btn { width: 160px; justify-content: flex-start; padding-left: 22px; gap: 10px; }
+        .btn-reset { background: linear-gradient(180deg, #f7fbff 0%, #eef8fe 100%); color: var(--roche-blue); border: 1px solid #b7def2; }
+        .btn-print { background: linear-gradient(180deg, #6366F1 0%, #4F46E5 100%); color: white; }
+        .btn-export { background: linear-gradient(180deg, #14B8A6 0%, #0D9488 100%); color: white; }
+
+        @media (hover: hover) and (pointer: fine) {
+            .action-icon-btn:hover { color: var(--roche-blue); border-color: #8fd1ee; background-color: #eef9fe; }
+            .action-btn:hover { transform: translateY(-2px); filter: brightness(1.02); }
+            .fab-main:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11, 65, 205, 0.4); }
+        }
+
+        /* UI 모달 팝업 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100dvh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); display: none; justify-content: center; align-items: flex-start; padding-top: 15vh; z-index: 1000; opacity: 0; transition: opacity 0.2s ease; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-content { background: white; width: 90%; max-width: 500px; border-radius: 12px; padding: 25px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: translateY(20px); transition: transform 0.2s ease; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-content h3 { margin: 0 0 15px 0; color: var(--roche-blue); font-size: 18px; }
+        
+        .file-list { list-style: none; padding: 0; margin: 0; max-height: 350px; overflow-y: auto; }
+        .file-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f4f8; font-size: 14px; gap: 8px;}
+        .file-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); font-weight: 500;}
+        .file-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        .sm-btn { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; }
+        .btn-view { background: rgba(11, 65, 205, 0.1); color: var(--roche-blue); } .btn-draw { background: #fff4e5; color: #b45d00; } .btn-del { background: #fee2e2; color: #dc2626; }
+
+        #imageViewerModal .modal-content { max-width: 900px; padding: 15px; } #viewerImage { width: 100%; height: auto; border-radius: 8px; max-height: 60vh; object-fit: contain; }
+        
+        /* 캔버스 드로잉 모달 - 아이패드 스크롤 차단용 CSS 추가 */
+        #imageEditorModal .modal-content { max-width: 900px; padding: 15px; } 
+        .canvas-container { position: relative; width: 100%; display: flex; justify-content: center; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; touch-action: none; overscroll-behavior: none; } 
+        #drawCanvas { max-width: 100%; max-height: 60vh; object-fit: contain; cursor: crosshair; } 
+        .editor-tools { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; } .tool-info { font-size: 13px; color: #dc2626; font-weight: bold; background: #fee2e2; padding: 4px 10px; border-radius: 20px;}
+        
+        .modal-textarea { width: 100%; height: 120px; padding: 12px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 8px; font-family: inherit; font-size: 16px; outline: none; resize: none; }
+        .modal-text-input { width: 100%; padding: 12px 14px; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 10px; font-size: 16px; outline: none; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .modal-btn { padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; border: none; }
+        .btn-cancel { background: #f4fbff; color: var(--roche-blue); border: 1px solid #c7e8f7; } .btn-confirm { background: linear-gradient(180deg, #1397d9 0%, #007AC2 100%); color: white; }
+
+        .print-option-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .print-option-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--roche-blue); }
+        .print-option-row label { font-size: 15px; cursor: pointer; color: var(--text-main); font-weight: 500;}
+
+        /* iOS 알림 커스텀 UI */
+        .ios-info-box { background: rgba(11, 65, 205, 0.05); border-left: 4px solid var(--roche-blue); padding: 12px 15px; border-radius: 4px; margin-bottom: 20px; }
+        .ios-info-box .ios-title { margin: 0 0 4px 0; font-size: 13.5px; font-weight: 800; color: var(--roche-blue); }
+        .ios-info-box .ios-desc { margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+
+        /* [모바일 반응형 Grid 대응] */
+        @media (max-width: 768px) {
+            body { padding: 12px; padding-bottom: 140px; }
+            .container { padding: 24px 14px 22px; border-radius: 24px; }
+            .top-info { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+            .info-box, .info-box.project-box, .info-box.date-box, .info-box.eng-box { grid-column: auto; min-height: 58px; }
+            
+            .grid-header-row { display: none; }
+            .eq-title-wrap { flex-direction: column; align-items: flex-start; gap: 2px; }
+            .btn-start { padding: 8px 16px; font-size: 13.5px; }
+            
+            /* 모바일 Item Row */
+            .grid-item-row { 
+                grid-template-columns: 36px 1fr 40px 65px; 
+                grid-template-areas: 
+                    "no item status remarkToggle"
+                    "remarkUI remarkUI remarkUI remarkUI";
+                padding: 6px 4px; gap: 4px 0; 
+            }
+            .grid-item-row > div { padding: 4px; }
+            .g-col-no { grid-area: no; font-size: 13px; }
+            .g-col-item { grid-area: item; font-size: 13.5px; font-weight: 600;}
+            .g-col-status { grid-area: status; }
+            .g-col-remark-toggle { grid-area: remarkToggle; justify-content: flex-end; }
+            .g-col-remark-ui { grid-area: remarkUI; width: 100%; padding: 0 !important; }
+            
+            .remark-ui-accordion {
+                display: grid; grid-template-rows: 0fr;
+                transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; opacity: 0;
+            }
+            .remark-ui-accordion.open { grid-template-rows: 1fr; opacity: 1; }
+            .remark-ui-inner { overflow: hidden; padding-top: 0; }
+            .remark-ui-accordion.open .remark-ui-inner { padding-top: 6px; padding-bottom: 6px; }
+
+            .remark-wrapper { flex-wrap: nowrap; gap: 5px; }
+            .chk-btn { width: 24px; height: 24px; border-radius: 6px; }
+            .toggle-label { display: none; }
+            .fab-container { right: 16px; bottom: 16px; }
+        }
+
+        /* [9. ★ PDF 인쇄 최적화] */
+        .global-print-photos { display: none; }
+        
+        @media print {
+            html, body { zoom: 0.85; background: #fff !important; padding: 0 !important; overflow: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .fab-container, .action-icon-btn, .item-attachment-count-btn, .toggle-label, .switch, .top-right-status, .tabs-container, .btn-start, .ios-info-box { display: none !important; }
+            .container { box-shadow: none !important; border: none !important; border-radius: 0 !important; backdrop-filter: none !important; padding: 0 !important; max-width: 100% !important; }
+            
+            .top-info { display: block !important; margin-bottom: 10px !important; padding: 0 !important; background: transparent !important; border: none !important; }
+            .info-box { display: block !important; margin: 0 0 6px 0 !important; padding: 0 0 4px 0 !important; border-bottom: 1px solid #d6dee8 !important; }
+            .equipment-box { padding-top: 4px !important; border-bottom: none !important; }
+            .equipment-panel { display: flex !important; gap: 6px !important; padding: 0 !important; }
+            .equipment-btn { min-height: auto !important; padding: 4px 10px !important; border-radius: 999px !important; border: 1px solid #d4dbe6 !important; background: #fff !important; color: #64748b !important; }
+            .equipment-btn.active { background: #eef3ff !important; color: #0b41cd !important; border-color: #7ca2ff !important; }
+            #check_date { display: none !important; }
+            .equip-text-input { display: none !important; }
+            
+            /* 탭 출력 제어 */
+            .tab-content { display: none !important; }
+            .tab-content.print-active { display: block !important; break-inside: auto; }
+            .tab-content.print-active + .tab-content.print-active { break-before: page; page-break-before: always; }
+            
+            .print-tab-title { display: block !important; color: var(--roche-blue-dark) !important; font-size: 22px !important; margin-bottom: 15px !important; border-bottom: 2px solid var(--roche-blue) !important; padding-bottom: 8px !important;}
+
+            .grid-table { display: block !important; }
+            
+            /* [중요] 인쇄 시 4단 칼정렬 강제 유지 */
+            .grid-header-row, .grid-item-row { 
+                display: grid !important; 
+                grid-template-columns: 40px minmax(0, 1.8fr) 65px minmax(0, 1.2fr) !important; 
+                grid-template-areas: none !important; 
+                break-inside: avoid; page-break-inside: avoid; 
+                align-items: start !important; 
+            }
+            .g-col-no, .g-col-item, .g-col-status, .g-col-remark-ui { grid-area: auto !important; min-width: 0 !important; }
+            
+            .grid-header-row > div:nth-child(4), .g-col-remark-toggle { display: none !important; }
+            .grid-header-row > div:nth-child(5) { justify-content: center !important; text-align: center !important; }
+
+            .grid-header-row { background-color: var(--roche-blue) !important; border-radius: 8px 8px 0 0 !important; box-shadow: none !important; margin-bottom: 0 !important; border: none !important;}
+            .grid-header-row > div { color: white !important; font-size: 13px !important; padding: 10px 8px !important; }
+            
+            .phase-group { box-shadow: none !important; border: none !important; margin-bottom: 12px !important; border-radius: 0 !important; break-inside: auto; page-break-inside: auto; }
+            .grid-category-row { 
+                display: block !important; width: 100% !important; background: #f0f7ff !important; 
+                border-bottom: 2px solid rgba(11, 65, 205, 0.6) !important; padding: 8px 10px !important; 
+                break-after: avoid; page-break-after: avoid;
+            }
+            .grid-category-row .g-col-title { display: block !important; width: 100% !important; color: var(--roche-blue-dark) !important; font-size: 14px !important; padding-left: 5px !important; }
+            .grid-category-row .g-col-actions { display: none !important; }
+            
+            .grid-item-row { border-bottom: 1px solid #e2e8f0 !important; }
+            .grid-item-row > div { font-size: 12px !important; padding: 8px !important; word-break: keep-all; } 
+            
+            .collapsed-phase { display: none !important; }
+            
+            .chk-btn { border-color: #cbd5e1 !important; background: #fff !important; }
+            .chk-btn.active { background: var(--roche-blue-dark) !important; border-color: var(--roche-blue-dark) !important; }
+            
+            .g-col-remark-ui { display: block !important; padding-left: 0 !important; width: 100% !important; }
+            .remark-ui-accordion, .remark-ui-inner { 
+                display: block !important; opacity: 1 !important; visibility: visible !important; 
+                transform: none !important; max-height: none !important; height: auto !important; width: 100% !important;
+            }
+            .remark-wrapper { display: flex !important; align-items: start !important; gap: 0 !important; width: 100% !important; }
+            .remark-input { display: none !important; }
+            
+            .print-remark-text { 
+                display: block !important; white-space: pre-wrap !important; overflow-wrap: break-word !important; 
+                word-break: break-all !important; font-size: 12px !important; margin: 0 !important; line-height: 1.5 !important; width: 100% !important;
+            }
+            .phase-accordion-wrapper { max-height: none !important; grid-template-rows: auto !important;}
+
+            .global-print-photos { display: none !important; padding-top: 16px; }
+            .global-print-photos.has-content { display: block !important; break-before: page; page-break-before: always; }
+            .phase-photo-block { break-inside: avoid; page-break-inside: avoid; margin-bottom: 20px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 15px;}
+            .phase-photo-block h4 { color: var(--roche-blue); font-size: 16px; margin: 0 0 10px 0; }
+            .phase-photo-block h5 { color: #1e293b; font-size: 13px; margin: 0 0 8px 0; }
+            .phase-photo-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 15px;}
+            .phase-photo-grid img { width: 100% !important; height: auto; border: 1px solid #cbd5e1; border-radius: 6px; object-fit: contain; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>CL&P Installation Pre-site Checklist</h1>
+        <p class="brand-subtitle">I&amp;LM Corelab</p>
+        <div class="top-right-status">
+            <div class="save-indicator" id="saveIndicator">수정하면 자동저장</div>
+        </div>
+    </header>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('tab1')">기본정보</button>
+        <button class="tab-btn" onclick="switchTab('tab2')">네트워크/전기/폐수</button>
+    </div>
+
+    <div class="top-info">
+        <div class="info-box project-box"><label>거래처 명</label><input type="text" id="project_name" placeholder="거래처 입력"></div>
+        <div class="info-box date-box" onclick="openDatePicker(event)">
+            <label>설치 일자</label>
+            <div class="date-input-shell"><input type="date" id="check_date" oninput="handleDateField(this)" onchange="handleDateField(this)"><div class="date-overlay" id="dateOverlay"><span class="date-prefix">📅</span><span class="date-display" id="dateDisplay">날짜 선택</span></div></div>
+        </div>
+        <div class="info-box eng-box"><label>담당자</label><input type="text" id="work_place" placeholder="담당자 입력"></div>
+        <div class="info-box equipment-box">
+            <div class="equipment-head">
+                <div class="eq-title-wrap">
+                    <label style="margin:0;">장비 조합</label>
+                    <span class="equipment-hint" style="margin:0;">업무 형태를 선택해주시고 장비 조합을 입력해주세요.</span>
+                </div>
+                <button type="button" id="btn-start" class="btn-start" onclick="startChecklist()">🚀 시작하기</button>
+            </div>
+            <div class="equipment-panel">
+                <button type="button" class="equipment-btn" data-equip="신규설치" onclick="toggleEquipment(this)">신규설치</button>
+                <button type="button" class="equipment-btn" data-equip="교체설치" onclick="toggleEquipment(this)">교체설치</button>
+                <button type="button" class="equipment-btn" data-equip="임시설치(평가)" onclick="toggleEquipment(this)">임시설치(평가)</button>
+            </div>
+            <div class="equip-text-wrapper">
+                <input type="text" id="equip_text_input" class="equip-text-input top-info-input" placeholder="장비 조합 입력하기" oninput="handleInputSync(this)">
+            </div>
+            <input type="hidden" id="equip_name" value="">
+        </div>
+    </div>
+
+    <div id="tabs-wrapper"></div>
+</div>
+
+<div class="fab-container">
+    <div class="fab-menu">
+        <button class="action-btn btn-export" onclick="openExportModal()">📤 공유하기</button>
+        <button class="action-btn btn-print" onclick="openPrintSelectModal()">🖨️ PDF 인쇄</button>
+        <button class="action-btn btn-reset" onclick="openClearResetModal()">🔄 전체 초기화</button>
+    </div>
+    <button class="fab-main" onclick="toggleFab(event)">⚙️ 추가 기능</button>
+</div>
+
+<div id="textModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>특이사항 상세 입력</h3>
+        <textarea id="modalTextarea" class="modal-textarea" placeholder="여러 줄로 길게 입력하셔도 인쇄 시 잘리지 않습니다."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" onclick="closeModal('textModal')">취소</button>
+            <button class="modal-btn btn-confirm" onclick="saveTextModal()">확인</button>
+        </div>
+    </div>
+</div>
+
+<div id="fileListModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>항목 첨부 파일</h3>
+        <ul id="fileListContainer" class="file-list"></ul>
+        <div class="modal-actions">
+            <button class="modal-btn btn-confirm" onclick="closeModal('fileListModal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<div id="imageViewerModal" class="modal-overlay">
+    <div class="modal-content" style="text-align: center;">
+        <h3>사진 확인</h3>
+        <img id="viewerImage" src="" alt="View Image">
+        <div class="modal-actions" style="justify-content: center;">
+            <button class="modal-btn btn-cancel" onclick="closeModal('imageViewerModal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<div id="imageEditorModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="editor-tools">
+            <h3 style="margin:0;">사진 그리기 (편집)</h3>
+            <span class="tool-info">빨간 펜 🔴</span>
+        </div>
+        <div class="canvas-container">
+            <canvas id="drawCanvas"></canvas>
+        </div>
+        <div class="modal-actions" style="justify-content: space-between;">
+            <button class="modal-btn btn-cancel" onclick="clearCanvas()">초기화</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="modal-btn btn-cancel" onclick="closeModal('imageEditorModal')">취소</button>
+                <button class="modal-btn btn-confirm" onclick="saveDrawing()">💾 저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="printSelectModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>PDF 인쇄 옵션</h3>
+        <div class="ios-info-box">
+            <p class="ios-title">💡 아이패드(iOS) 사용 팁</p>
+            <p class="ios-desc">프린터 창이 열리면, 하얀색 미리보기 이미지를 <strong>두 손가락으로 확대(Pinch Out)</strong>하여 PDF로 편하게 저장하거나 공유할 수 있습니다.</p>
+        </div>
+        
+        <p style="margin:0 0 15px 0; color: var(--text-muted); font-size: 14px; line-height: 1.55;">
+            보고서로 출력할 탭과 인쇄 후 동작을 선택해 주세요.
+        </p>
+        
+        <div id="print-tab-selector" style="display:flex; flex-direction:column; gap:12px; margin-bottom: 20px;"></div>
+        
+        <div style="background: #f8fafc; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-weight: 700; color: var(--text-main); font-size: 14.5px;">인쇄 후 내용 초기화</span>
+                <span style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">인쇄 완료 시 모든 데이터를 삭제합니다.</span>
+            </div>
+            <label class="switch"><input type="checkbox" id="print-auto-clear-chk" checked><span class="slider"></span></label>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" onclick="closeModal('printSelectModal')">취소</button>
+            <button class="modal-btn btn-confirm" onclick="executePDFPrint()">인쇄 시작</button>
+        </div>
+    </div>
+</div>
+
+<div id="clearResetModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>전체 초기화</h3>
+        <p style="margin:0 0 8px 0; color: var(--text-main); font-size: 15px; font-weight: 600; line-height: 1.55;">현재 입력한 체크리스트 내용을 모두 초기화할까요?</p>
+        <p style="margin:0; color: var(--text-muted); font-size: 14px; line-height: 1.55;">저장된 임시 데이터와 입력값, 상태, 첨부 사진이 모두 삭제되며 되돌릴 수 없습니다.</p>
+        <div class="modal-actions" style="justify-content: space-between;">
+            <button class="modal-btn btn-cancel" onclick="closeModal('clearResetModal')">취소</button>
+            <button class="modal-btn btn-confirm" onclick="confirmClearAllData()">초기화하기</button>
+        </div>
+    </div>
+</div>
+
+<div id="deletePhotoModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>사진 삭제</h3>
+        <p style="margin:0 0 8px 0; color: var(--text-main); font-size: 15px; font-weight: 600; line-height: 1.55;">선택한 사진을 삭제할까요?</p>
+        <p style="margin:0; color: var(--text-muted); font-size: 14px; line-height: 1.55;">삭제한 사진은 되돌릴 수 없습니다.</p>
+        <div class="modal-actions" style="justify-content: space-between;">
+            <button class="modal-btn btn-cancel" onclick="closeModal('deletePhotoModal')">취소</button>
+            <button class="modal-btn btn-confirm" onclick="confirmDeletePhoto()">삭제하기</button>
+        </div>
+    </div>
+</div>
+
+<div id="exportModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>공유 파일명 지정</h3>
+        <div class="ios-info-box">
+            <p class="ios-title">💡 아이패드(iOS) 사용 팁</p>
+            <p class="ios-desc">파일이 새 창으로 열릴 경우, 당황하지 마시고 사파리 우측 상단의 <strong>공유[↑] 버튼</strong>을 눌러 <strong>[파일에 저장]</strong>을 선택해 주세요.</p>
+        </div>
+
+        <p style="margin:0 0 14px 0; color: var(--text-muted); font-size: 14px; line-height: 1.55;">저장할 공유용 HTML 파일명을 입력해 주세요.</p>
+        <input type="text" id="exportFilenameInput" class="modal-text-input" placeholder="예: 20260401 삼성서울병원 CL&P Installation Pre-site Checklist" maxlength="120">
+        <div class="modal-actions">
+            <button class="modal-btn btn-cancel" onclick="closeModal('exportModal')">취소</button>
+            <button class="modal-btn btn-confirm" onclick="confirmExportSharedHTML()">저장</button>
+        </div>
+    </div>
+</div>
+
+<script id="injected-data"></script>
+
+<script>
+    // [탭 및 체크리스트 데이터]
+    const TAB_NAMES = { tab1: "기본정보", tab2: "네트워크/전기/폐수" };
+    
+    const CHECKLIST_DATA = {
+        tab1: [
+            { phase: 1, title: "장비 반입", items: ["예상 반입 시간 - 상세 내용에 시간을 기재해주세요", "Unpacking 여부 확인", "장비 하역 공간의 차량 접근성 확인", "특수 차량(지게차or하이랜더) 사용 여부 확인", "건물 내 반입 경로(지상or창문) 확인", "바닥 보양 필요 여부 확인 - 상세 내용에 거리를 기재해주세요", "엘리베이터 사용 시 사이즈(900mm) 확인", "설치 공간 및 부품 적재 공간 확인"] },
+            { phase: 2, title: "3rd Party Vender 일정 조율", items: ["도비 업체 일정 및 필요 인원 확인", "물 공급 증류장치 종류 및 일정 확인", "맵스 일정 확인", "LIS Interface 업체 및 일정 확인"] }
+        ],
+        tab2: [
+            { phase: 1, title: "네트워크 확인", items: ["Link PC 외부망 연결을 위한 고정 IP 요청", "(필요 시)LIS 연결을 위한 고정 IP 요청", "1.1/1.2에 사용되는 물리적 Lan cable/Port 확인", "(Infinity 이용 시)NP&S IT Team과 일정 확인"] },
+            { phase: 2, title: "전기 확인", items: ["검사실 전기 배전반or분전함 확인", "차단기 용량 확인", "시설팀과 장비 전력 소모 용량 확인", "UPS 사용 여부 확인", "전기 입력선(+ 없다면 시설팀 공사 여부) 굵기 확인"] },
+            { phase: 3, title: "폐수 확인", items: ["설치 될 장비의 폐수 배출 경로 확인", "배출 경로(관)의 사이즈 확인", "타사 장비와의 병목 여부 확인", "자연 배수 가능 여부 확인"] }
+        ]
+    };
+
+    function renderChecklist() {
+        const wrapper = document.getElementById('tabs-wrapper');
+        let html = '';
+        
+        Object.keys(CHECKLIST_DATA).forEach(tabKey => {
+            const isActive = tabKey === 'tab1' ? 'active' : ''; 
+            html += `<div id="${tabKey}-content" class="tab-content ${isActive}">
+                        <h2 class="print-tab-title" style="display:none;">[ ${TAB_NAMES[tabKey]} ]</h2>
+                        <div class="grid-table">
+                            <div class="grid-header-row">
+                                <div class="g-col-no">No.</div>
+                                <div class="g-col-item">점검 항목 (Check Items)</div>
+                                <div class="g-col-status">확인 완료</div>
+                                <div class="g-col-remark-toggle">비고 추가</div>
+                                <div class="g-col-remark-ui">상세 내용 및 증빙 사진</div>
+                            </div>`;
+                            
+            CHECKLIST_DATA[tabKey].forEach(p => {
+                html += `
+                <div class="phase-group" data-phase="${p.phase}">
+                    <div class="grid-category-row">
+                        <div class="g-col-title"><span>Phase ${p.phase}. ${p.title}</span></div>
+                        <div class="g-col-actions">
+                            <div class="header-btn-group">
+                                <span class="toggle-label">숨기기</span>
+                                <label class="switch"><input type="checkbox" onchange="togglePhase(this)"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="phase-accordion-wrapper">
+                        <div class="phase-accordion-inner">`;
+                
+                p.items.forEach((itemText, idx) => {
+                    const visualId = `${p.phase}.${idx + 1}`;
+                    const itemId = `${tabKey}-${visualId}`; 
+                    html += `
+                            <div class="grid-item-row" data-item-id="${itemId}">
+                                <div class="g-col-no">${visualId}</div>
+                                <div class="g-col-item">${itemText}</div>
+                                <div class="g-col-status">
+                                    <div class="status-group"><div class="chk-btn" onclick="togglePassFail(this, 'Pass')"></div><input type="hidden" class="status-value" value=""></div>
+                                </div>
+                                <div class="g-col-remark-toggle">
+                                    <label class="switch small-switch" title="비고/사진 추가"><input type="checkbox" class="remark-toggle-chk" onchange="toggleRemarkUI(this)"><span class="slider"></span></label>
+                                </div>
+                                <div class="g-col-remark-ui">
+                                    <div class="remark-ui-accordion">
+                                        <div class="remark-ui-inner">
+                                            <div class="remark-wrapper">
+                                                <input type="text" class="remark-input" placeholder="특이사항 직접 입력" oninput="handleInputSync(this)">
+                                                <div class="print-remark-text"></div>
+                                                <button class="action-icon-btn" onclick="openTextModal(this)" title="상세 쓰기">✎</button>
+                                                <label class="action-icon-btn photo-btn" title="사진 다중 첨부">📷 <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handleItemPhotoUpload(this)"></label>
+                                                <button class="item-attachment-count-btn count-0" onclick="openItemFileListModal(this)">📁 0</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                });
+                html += `</div></div></div>`;
+            });
+            html += `</div><div id="${tabKey}-photos" class="global-print-photos"></div></div>`;
+        });
+        wrapper.innerHTML = html;
+        renderPrintSelector();
+    }
+
+    // [로직 복구: IndexedDB 자동저장 및 모든 기능]
+    let hasStarted = false; let lastActiveTab = 'tab1'; let globalImages = {}; 
+    let currentInputRef = null; let currentItemId = null; let pendingDeleteImageId = null;
+    let editingImageId = null; let isDrawing = false; let originalImageObj = null;
+    const DB_NAME = "RocheChecklistDB_vFinalCompleted"; const STORE_NAME = "DraftStore";
+    let autoSaveTimer = null; let saveIndicatorTimer = null;
+
+    function setSaveIndicator(msg = '자동저장됨', state = 'saved') {
+        const ind = document.getElementById('saveIndicator'); if(!ind) return;
+        ind.textContent = msg; ind.className = `save-indicator ${state}`;
+        if(saveIndicatorTimer) clearTimeout(saveIndicatorTimer);
+        if(state !== 'pending') saveIndicatorTimer = setTimeout(() => { ind.textContent = '수정하면 자동저장'; ind.className = 'save-indicator'; }, 1800);
+    }
+    function queueAutoSave() { if(autoSaveTimer) clearTimeout(autoSaveTimer); setSaveIndicator('저장 대기중…', 'pending'); autoSaveTimer = setTimeout(() => saveToDatabase(true), 700); }
+    function sanitizeFileName(n) { return (n || 'Checklist').replace(/[\\/:*?"<>|]/g, '_').trim(); }
+    function openDatePicker(e) { if(e) e.stopPropagation(); const i = document.getElementById('check_date'); i.showPicker ? i.showPicker() : i.click(); }
+    function handleDateField(i) {
+        const d = document.getElementById('dateDisplay'); const val = i.value;
+        d.textContent = val ? val.replace(/-/g, '.') : '날짜 선택';
+        i.closest('.date-box').classList.toggle('has-date', !!val); handleInputSync(i);
+    }
+
+    // 장비 버튼 단일 선택(라디오 버튼 형식)
+    function toggleEquipment(btn) { 
+        const isActive = btn.classList.contains('active');
+        document.querySelectorAll('.equipment-btn').forEach(b => b.classList.remove('active'));
+        if (!isActive) btn.classList.add('active');
+        syncEquipmentInput(); 
+        if(hasStarted) queueAutoSave(); 
+    }
+    function syncEquipmentInput() {
+        const sel = Array.from(document.querySelectorAll('.equipment-btn.active')).map(b => b.dataset.equip);
+        document.getElementById('equip_name').value = sel.join(', ');
+    }
+
+    function startChecklist() { hasStarted = true; document.body.classList.add('app-started'); switchTab('tab1'); queueAutoSave(); }
+    function switchTab(id) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.querySelector(`.tab-btn[onclick*="${id}"]`); if(activeBtn) activeBtn.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const content = document.getElementById(`${id}-content`); if(content) content.classList.add('active');
+        lastActiveTab = id; if(hasStarted) queueAutoSave(); renderPrintPhotos();
+    }
+
+    function togglePhase(chk, init = false) {
+        const grp = chk.closest('.phase-group'); chk.checked ? grp.classList.add('collapsed-phase') : grp.classList.remove('collapsed-phase');
+        if(!init) renderPrintPhotos(); if(!init && hasStarted) queueAutoSave();
+    }
+    function toggleRemarkUI(chk, init = false) {
+        const acc = chk.closest('.grid-item-row').querySelector('.remark-ui-accordion');
+        chk.checked ? acc.classList.add('open') : acc.classList.remove('open');
+        if(!init && hasStarted) queueAutoSave();
+    }
+    function handleInputSync(i) {
+        if(i.classList.contains('remark-input')) { i.dataset.fulltext = i.value; const p = i.closest('.remark-wrapper').querySelector('.print-remark-text'); if(p) p.innerText = i.value; }
+        if(hasStarted) queueAutoSave();
+    }
+    function togglePassFail(btn, val) {
+        const grp = btn.closest('.status-group'); const hid = grp.querySelector('.status-value'); const act = btn.classList.contains('active');
+        grp.querySelectorAll('.chk-btn').forEach(b => b.classList.remove('active')); hid.value = '';
+        if(!act) { btn.classList.add('active'); hid.value = val; } if(hasStarted) queueAutoSave();
+    }
+
+    function makeImageId() { return `${Date.now()}_${Math.random().toString(36).substr(2, 6)}`; }
+    async function downscaleImage(file, maxSide = 1280) {
+        const data = await new Promise(res => { const reader = new FileReader(); reader.onload = e => res(e.target.result); reader.readAsDataURL(file); });
+        const img = await new Promise(res => { const i = new Image(); i.onload = () => res(i); i.src = data; });
+        const ratio = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas'); canvas.width = img.width * ratio; canvas.height = img.height * ratio;
+        const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', 0.85);
+    }
+    async function handleItemPhotoUpload(input) {
+        const files = Array.from(input.files); if(!files.length) return;
+        const itemId = input.closest('.grid-item-row').dataset.itemId; if(!globalImages[itemId]) globalImages[itemId] = [];
+        for(let f of files) { const data = await downscaleImage(f); globalImages[itemId].push({ id: makeImageId(), name: f.name, data }); }
+        updateItemPhotoUI(itemId); if(hasStarted) queueAutoSave(); input.value = '';
+    }
+    function updateItemPhotoUI(itemId) {
+        const row = document.querySelector(`.grid-item-row[data-item-id="${itemId}"]`); if(!row) return;
+        const btn = row.querySelector('.item-attachment-count-btn'); const imgs = globalImages[itemId] || [];
+        btn.innerHTML = `📁 ${imgs.length}`; btn.className = `item-attachment-count-btn count-${imgs.length > 0 ? 'active' : '0'}`;
+        renderPrintPhotos();
+    }
+    function openItemFileListModal(btn) {
+        currentItemId = btn.closest('.grid-item-row').dataset.itemId;
+        const cont = document.getElementById('fileListContainer'); cont.innerHTML = '';
+        (globalImages[currentItemId] || []).forEach(img => {
+            const li = document.createElement('li'); li.className = 'file-item';
+            li.innerHTML = `<span class="file-item-name">📷 ${img.name}</span><div class="file-actions">
+                <button class="sm-btn btn-view" onclick="viewImage('${img.id}')">🔍</button>
+                <button class="sm-btn btn-draw" onclick="openEditor('${img.id}')">🖌️</button>
+                <button class="sm-btn btn-del" onclick="openDeletePhotoModal('${img.id}')">🗑️</button></div>`;
+            cont.appendChild(li);
+        });
+        document.getElementById('fileListModal').classList.add('show');
+    }
+    function viewImage(id) { const img = globalImages[currentItemId].find(i => i.id === id); document.getElementById('viewerImage').src = img.data; document.getElementById('imageViewerModal').classList.add('show'); }
+    function openEditor(id) {
+        editingImageId = id; originalImageObj = globalImages[currentItemId].find(i => i.id === id);
+        const img = new Image(); img.onload = () => {
+            const cvs = document.getElementById('drawCanvas'); cvs.width = img.width; cvs.height = img.height;
+            const ctx = cvs.getContext('2d'); ctx.drawImage(img, 0, 0); ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            document.getElementById('imageEditorModal').classList.add('show');
+        }; img.src = originalImageObj.data;
+    }
+    function clearCanvas() { const cvs = document.getElementById('drawCanvas'); const ctx = cvs.getContext('2d'); const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = originalImageObj.data; }
+    function saveDrawing() {
+        const data = document.getElementById('drawCanvas').toDataURL('image/jpeg', 0.85);
+        const idx = globalImages[currentItemId].findIndex(i => i.id === editingImageId); globalImages[currentItemId][idx].data = data;
+        closeModal('imageEditorModal'); renderPrintPhotos(); if(hasStarted) queueAutoSave();
+    }
+    function openDeletePhotoModal(id) { pendingDeleteImageId = id; document.getElementById('deletePhotoModal').classList.add('show'); }
+    function confirmDeletePhoto() {
+        globalImages[currentItemId] = globalImages[currentItemId].filter(i => i.id !== pendingDeleteImageId);
+        updateItemPhotoUI(currentItemId); openItemFileListModal(document.querySelector(`.grid-item-row[data-item-id="${currentItemId}"] .item-attachment-count-btn`));
+        closeModal('deletePhotoModal'); if(hasStarted) queueAutoSave();
+    }
+
+    function openTextModal(btn) {
+        currentInputRef = btn.closest('.remark-wrapper').querySelector('.remark-input');
+        document.getElementById('modalTextarea').value = currentInputRef.dataset.fulltext || currentInputRef.value;
+        document.getElementById('textModal').classList.add('show');
+    }
+    function saveTextModal() {
+        const val = document.getElementById('modalTextarea').value; currentInputRef.dataset.fulltext = val; currentInputRef.value = val.replace(/\n/g, ' ');
+        handleInputSync(currentInputRef); closeModal('textModal');
+    }
+
+    function renderPrintSelector() {
+        const cont = document.getElementById('print-tab-selector');
+        cont.innerHTML = `<div class="print-option-row"><input type="checkbox" id="print-tab-all" checked onchange="togglePrintAll(this)"><label for="print-tab-all" style="font-weight:800; color:var(--roche-blue);">전체 탭 통합 인쇄</label></div><hr style="border:0; border-top:1px solid #eee;">`;
+        Object.entries(TAB_NAMES).forEach(([k, v]) => {
+            cont.innerHTML += `<div class="print-option-row"><input type="checkbox" class="print-tab-chk" value="${k}" id="chk-${k}" checked><label for="chk-${k}">${v}</label></div>`;
+        });
+    }
+    function togglePrintAll(all) { document.querySelectorAll('.print-tab-chk').forEach(c => c.checked = all.checked); }
+    function openPrintSelectModal() { closeFabMenu(); document.getElementById('printSelectModal').classList.add('show'); }
+    function executePDFPrint() {
+        const sel = Array.from(document.querySelectorAll('.print-tab-chk:checked')).map(c => c.value);
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('print-active', sel.includes(c.id.replace('-content', ''))));
+        closeModal('printSelectModal'); setTimeout(() => { window.print(); }, 200);
+    }
+    window.addEventListener('afterprint', () => { if(document.getElementById('print-auto-clear-chk').checked) resetAllDataNow(); });
+
+    async function initDB() { return new Promise((res, rej) => { const req = indexedDB.open(DB_NAME, 1); req.onupgradeneeded = e => e.target.result.createObjectStore(STORE_NAME); req.onsuccess = e => res(e.target.result); }); }
+    async function saveToDatabase(isAuto = false) {
+        const inputs = Array.from(document.querySelectorAll('.top-info input, .tab-content.active .remark-input, .top-info-input')).map(i => i.dataset.fulltext || i.value);
+        const selects = Array.from(document.querySelectorAll('.status-value')).map(s => s.value);
+        const pt = Array.from(document.querySelectorAll('.grid-category-row .switch input')).map(c => c.checked);
+        const rt = Array.from(document.querySelectorAll('.remark-toggle-chk')).map(c => c.checked);
+        const db = await initDB(); const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).put({ inputs, selects, images: globalImages, pt, rt, hasStarted, lastActiveTab }, "currentDraft");
+        setSaveIndicator(isAuto ? '자동저장됨' : '저장 완료', 'saved');
+    }
+    async function loadFromDatabase() {
+        const db = await initDB(); const data = await new Promise(res => { const req = db.transaction(STORE_NAME).objectStore(STORE_NAME).get("currentDraft"); req.onsuccess = () => res(req.result); });
+        if(!data || !data.hasStarted) return;
+        hasStarted = true; document.body.classList.add('app-started'); switchTab(data.lastActiveTab);
+        const inps = document.querySelectorAll('.top-info input, .tab-content.active .remark-input, .top-info-input');
+        data.inputs.forEach((v, i) => { if(inps[i]) { inps[i].value = v.replace(/\n/g, ' '); inps[i].dataset.fulltext = v; handleInputSync(inps[i]); } });
+        const sls = document.querySelectorAll('.status-value');
+        data.selects.forEach((v, i) => { if(sls[i] && v) { const btn = sls[i].closest('.status-group').querySelector('.chk-btn'); btn.classList.add('active'); sls[i].value = v; } });
+        const pts = document.querySelectorAll('.grid-category-row .switch input');
+        if(data.pt) data.pt.forEach((v, i) => { if(pts[i]) { pts[i].checked = v; togglePhase(pts[i], true); } });
+        const rts = document.querySelectorAll('.remark-toggle-chk');
+        if(data.rt) data.rt.forEach((v, i) => { if(rts[i]) { rts[i].checked = v; toggleRemarkUI(rts[i], true); } });
+        globalImages = data.images || {}; Object.keys(globalImages).forEach(id => updateItemPhotoUI(id));
+        syncEquipmentInput(); setSaveIndicator('임시저장본 불러옴');
+    }
+
+    function toggleFab(e) { e.stopPropagation(); const m = document.querySelector('.fab-menu'); m.classList.toggle('open'); }
+    function closeFabMenu() { document.querySelector('.fab-menu').classList.remove('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow = ''; }
+    function resetAllDataNow() { initDB().then(db => { db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).delete("currentDraft"); location.reload(); }); }
+    function openClearResetModal() { closeFabMenu(); document.getElementById('clearResetModal').classList.add('show'); }
+    function confirmClearAllData() { resetAllDataNow(); }
+
+    function openExportModal() { closeFabMenu(); document.getElementById('exportModal').classList.add('show'); }
+    function confirmExportSharedHTML() { 
+        const input = document.getElementById('exportFilenameInput'); 
+        const customFileName = sanitizeFileName((input.value || '').trim());
+        
+        const clone = document.documentElement.cloneNode(true);
+        clone.querySelectorAll('.tab-content:not(.active)').forEach(el => el.remove());
+        clone.querySelector('.tabs-container').remove();
+
+        const originalInputs = document.querySelectorAll('.top-info input, .tab-content.active .remark-input'); 
+        const cloneInputs = clone.querySelectorAll('.top-info input, .tab-content.active .remark-input');
+        originalInputs.forEach((input, i) => { 
+            cloneInputs[i].setAttribute('value', input.value); 
+            if(input.classList.contains('remark-input') && input.dataset.fulltext !== undefined) { 
+                cloneInputs[i].setAttribute('data-fulltext', input.dataset.fulltext); 
+                const printDiv = cloneInputs[i].closest('.remark-wrapper')?.querySelector('.print-remark-text'); 
+                if(printDiv) printDiv.innerText = input.dataset.fulltext; 
+            } 
+        });
+        
+        const originalStatus = document.querySelectorAll('.tab-content.active .status-value'); 
+        const cloneStatus = clone.querySelectorAll('.tab-content.active .status-value'); 
+        originalStatus.forEach((input, i) => { cloneStatus[i].setAttribute('value', input.value); });
+        
+        const originalPhaseToggles = document.querySelectorAll('.tab-content.active .grid-category-row .switch input'); 
+        const clonePhaseToggles = clone.querySelectorAll('.tab-content.active .grid-category-row .switch input');
+        originalPhaseToggles.forEach((chk, i) => { if(chk.checked) clonePhaseToggles[i].setAttribute('checked', 'checked'); else clonePhaseToggles[i].removeAttribute('checked'); });
+        
+        const originalRemarkToggles = document.querySelectorAll('.tab-content.active .remark-toggle-chk'); 
+        const cloneRemarkToggles = clone.querySelectorAll('.tab-content.active .remark-toggle-chk');
+        originalRemarkToggles.forEach((chk, i) => { if(chk.checked) cloneRemarkToggles[i].setAttribute('checked', 'checked'); else cloneRemarkToggles[i].removeAttribute('checked'); });
+
+        clone.querySelector('#injected-data').textContent = `
+            window.INJECTED_IMAGES = ${JSON.stringify(globalImages)};
+            window.INJECTED_HAS_STARTED = ${hasStarted};
+            window.INJECTED_LAST_TAB = "${lastActiveTab}";
+        `;
+        const htmlStr = "<!DOCTYPE html>\n" + clone.outerHTML; 
+        const blob = new Blob([htmlStr], {type: "text/html;charset=utf-8"}); 
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url;
+        const projInput = sanitizeFileName(document.getElementById('project_name').value.trim()); 
+        const defaultProjName = projInput || "Checklist";
+        a.download = `${customFileName || (projInput ? `${defaultProjName} 프로젝트 (공유용)` : `[공유]_${defaultProjName}`)}.html`;
+        a.click(); setTimeout(() => URL.revokeObjectURL(url), 1500); closeFabMenu();
+    }
+
+    function renderPrintPhotos() {
+        Object.keys(CHECKLIST_DATA).forEach(tk => {
+            const cont = document.getElementById(`${tk}-photos`); if(!cont) return; cont.innerHTML = '';
+            let hasAny = false;
+            document.querySelectorAll(`#${tk}-content .phase-group:not(.collapsed-phase)`).forEach(grp => {
+                const titleSpan = grp.querySelector('.g-col-title span');
+                if(!titleSpan) return;
+                const title = titleSpan.innerText; let phaseHas = false;
+                const block = document.createElement('div'); block.className = 'phase-photo-block'; block.innerHTML = `<h4>[${title}] 첨부 사진</h4>`;
+                grp.querySelectorAll('.grid-item-row').forEach(row => {
+                    const imgs = globalImages[row.dataset.itemId]; if(imgs && imgs.length) {
+                        hasAny = true; phaseHas = true;
+                        const sub = document.createElement('h5'); sub.innerText = `항목 ${row.querySelector('.g-col-no').innerText}. ${row.querySelector('.g-col-item').innerText}`;
+                        const grid = document.createElement('div'); grid.className = 'phase-photo-grid';
+                        imgs.forEach(i => grid.innerHTML += `<img src="${i.data}">`);
+                        block.appendChild(sub); block.appendChild(grid);
+                    }
+                });
+                if(phaseHas) cont.appendChild(block);
+            });
+            cont.classList.toggle('has-content', hasAny);
+        });
+    }
+
+    const cvs = document.getElementById('drawCanvas'); const ctx = cvs.getContext('2d');
+    function getPos(e) {
+        const rect = cvs.getBoundingClientRect(); const x = (e.clientX || e.touches[0].clientX) - rect.left; const y = (e.clientY || e.touches[0].clientY) - rect.top;
+        return { x: x * (cvs.width / rect.width), y: y * (cvs.height / rect.height) };
+    }
+    cvs.addEventListener('mousedown', e => { isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+    cvs.addEventListener('mousemove', e => { if(!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+    cvs.addEventListener('mouseup', () => isDrawing = false);
+    cvs.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, {passive:false});
+    cvs.addEventListener('touchmove', e => { if(!isDrawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }, {passive:false});
+    cvs.addEventListener('touchend', () => isDrawing = false);
+
+    document.addEventListener('DOMContentLoaded', () => { renderChecklist(); loadFromDatabase(); });
+</script>
+</body>
+</html>
